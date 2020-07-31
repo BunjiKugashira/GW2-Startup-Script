@@ -14,5 +14,8 @@
     "dependencies": {
         "node-notifier": "^7.0.1",
         "openid-client": "13.15.6"
+    },
+    "scripts": {
+        "build": "mkdir -p dist && cp ./config ./dist/config && cp ./src ./dist/src && cp ./assets ./dist/assets && cp 'Guild Wars 2.lnk' './dist/Guild Wars 2.lnk'"
     }
 }

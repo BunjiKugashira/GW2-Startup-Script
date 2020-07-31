@@ -22,6 +22,13 @@ jobs:
       - name: 'Setup Node'
         uses: actions/setup-node@v1
 
+      - name: 'Build Project'
+        run: npm run build
+
+      - name: 'Create zip'
+        working-directory: ./dist
+        run: zip -r "GW2-Startup-Script.zip" "./**"
+
       - name: 'Install CI-Tools'
         run: sudo npm install -g @process-engine/ci_tools@latest
 
@@ -38,4 +45,6 @@ jobs:
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
+        run: |
+          ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
+          ci_tools update-github-release --only-on-primary-branches --assets dist/GW2-Startup-Script.zip
