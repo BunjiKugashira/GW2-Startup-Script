@@ -3,9 +3,9 @@ name: Test Release CI
 on:
   push:
     branches:
-      - "feature"
-      - "hotfix"
-      - "release"
+      - "feature/*"
+      - "hotfix/*"
+      - "release/*"
 
 jobs:
   release:
