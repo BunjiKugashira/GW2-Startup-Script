@@ -9,7 +9,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     if: "!contains(github.event.head_commit.message, 'skip ci')"
 
     defaults:
@@ -25,15 +25,25 @@ jobs:
       - name: 'Build Project'
         run: npm run build
 
+      - name: 'Show workspace'
+        run: echo "$(ls -aR $GITHUB_WORKSPACE)"
+
+      - name: 'Create exe'
+        working-directory: ./src
+        shell: powershell -Version 4 {0}
+        run: ../tools/ps2exe/ps2exe.ps1 -IconFile GW2.ico -InputFile GW2.ps1 -OutputFile "../dist/GW2 Startup Script.exe"
+
       - name: 'Create zip'
         working-directory: ./dist
-        run: zip -r "GW2-Startup-Script.zip" "."
+        run: Compress-Archive "." "GW2-Startup-Script.zip"
 
       - name: 'Install CI-Tools'
-        run: sudo npm install -g @process-engine/ci_tools@latest
+        run: npm install -g @process-engine/ci_tools@latest
 
       - name: 'Prepare Version'
         run: ci_tools prepare-version --allow-dirty-workdir
 
       - name: 'Print Result'
-        run: echo ls -aR
+        working-directory: ./dist
+        shell: bash
+        run: echo "$(ls -aR)"
