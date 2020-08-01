@@ -14,34 +14,35 @@ jobs:
 
     defaults:
       run:
+        shell: powershell -Version 4.0 {0}
         working-directory: ./
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: 'Setup Node'
         uses: actions/setup-node@v1
 
-      - name: 'Build Project'
-        run: npm run build
-
-      - name: 'Show workspace'
-        run: echo "$(ls -aR $GITHUB_WORKSPACE)"
-
-      - name: 'Create exe'
-        working-directory: ./src
-        shell: powershell -Version 4 {0}
-        run: ../tools/ps2exe/ps2exe.ps1 -IconFile GW2.ico -InputFile GW2.ps1 -OutputFile "../dist/GW2 Startup Script.exe"
-
-      - name: 'Create zip'
-        working-directory: ./dist
-        run: Compress-Archive "./*" "GW2-Startup-Script.zip"
+      - name: 'Setup ps2exe'
+        working-directory: ./PS2EXE
+        run: Install-Module -Scope CurrentUser -Force ps2exe
 
       - name: 'Install CI-Tools'
         run: npm install -g @process-engine/ci_tools@latest
 
       - name: 'Prepare Version'
         run: ci_tools prepare-version --allow-dirty-workdir
+
+      - name: 'Build Project'
+        run: npm run build
+
+      - name: 'Create exe'
+        working-directory: ./src
+        run: ps2exe -IconFile GW2.ico -InputFile GW2.ps1 -OutputFile "../dist/GW2 Startup Script.exe" -title "GW2 Startup Script" -version ${require('../package.json').version}
+
+      - name: 'Create zip'
+        working-directory: ./dist
+        run: Compress-Archive "./*" "GW2-Startup-Script.zip"
 
       - name: 'Commit & tag version'
         env:
