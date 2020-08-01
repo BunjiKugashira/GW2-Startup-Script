@@ -24,7 +24,7 @@ jobs:
 
       - name: 'Setup ps2exe'
         working-directory: ./PS2EXE
-        run: Install-Module ps2exe
+        run: Install-Module -Scope CurrentUser ps2exe
 
       - name: 'Install CI-Tools'
         run: npm install -g @process-engine/ci_tools@latest
