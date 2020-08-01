@@ -35,7 +35,7 @@ jobs:
 
       - name: 'Create zip'
         working-directory: ./dist
-        run: Compress-Archive "." "GW2-Startup-Script.zip"
+        run: Compress-Archive "./*" "GW2-Startup-Script.zip"
 
       - name: 'Install CI-Tools'
         run: npm install -g @process-engine/ci_tools@latest
