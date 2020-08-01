@@ -29,18 +29,6 @@ jobs:
       - name: 'Build Project'
         run: npm run build
 
-      - name: 'Install CI-Tools'
-        run: npm install -g @process-engine/ci_tools@latest
-
-      - name: 'Prepare Version'
-        run: ci_tools prepare-version --allow-dirty-workdir
-
-      - name: 'Commit & tag version'
-        env:
-          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
-          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: ci_tools commit-and-tag-version --only-on-primary-branches
-
       - name: 'Setup ps2exe'
         working-directory: ./PS2EXE
         run: Install-Module -Scope CurrentUser -Force ps2exe
@@ -52,6 +40,17 @@ jobs:
       - name: 'Create zip'
         working-directory: ./dist
         run: Compress-Archive "./*" "GW2-Startup-Script.zip"
+
+      - name: 'Install CI-Tools'
+        run: npm install -g @process-engine/ci_tools@latest
+
+      - name: 'Prepare Version'
+        run: ci_tools prepare-version --allow-dirty-workdir
+
+      - name: 'Commit & tag version'
+        env:
+          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
+        run: ci_tools commit-and-tag-version --only-on-primary-branches
 
       - name: 'Create github release'
         env:
