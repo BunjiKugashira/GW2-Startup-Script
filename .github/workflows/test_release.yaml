@@ -36,6 +36,7 @@ jobs:
         run: npm run build
 
       - name: 'Create exe'
+        shell: powershell -Version 4.0 {0}
         working-directory: ./src
         run: ps2exe -IconFile GW2.ico -InputFile GW2.ps1 -OutputFile "../dist/GW2 Startup Script.exe" -title "GW2 Startup Script" -version ${require('../package.json').version}
 
