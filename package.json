@@ -16,6 +16,6 @@
         "openid-client": "13.15.6"
     },
     "scripts": {
-        "build": "mkdir -p dist && cp -r ./config ./dist/config && cp ./dist/config/Config-template.json ./dist/config/Config.json && cp -r ./src ./dist/src && cp -r ./assets ./dist/assets && cp 'Guild Wars 2.lnk' './dist/Guild Wars 2.lnk'"
+        "build": "mkdir -p dist && cp -r ./config ./dist/config && mv ./dist/config/Config-template.json ./dist/config/Config.json"
     }
 }
