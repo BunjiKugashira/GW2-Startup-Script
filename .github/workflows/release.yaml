@@ -29,7 +29,7 @@ jobs:
 
       - name: 'Test Dry Flag'
         run: |
-          echo "DRY_FLAG=${DRY_FLAG}"
+          echo "DRY_FLAG=$DRY_FLAG"
           printenv
 
       - name: 'Checkout Branch'
