@@ -2,7 +2,7 @@
 Param()
 
 # Config - Change these variables to match your personal setup
-$JSON = Get-Content "../config/Config.json" | Out-String | ConvertFrom-Json
+$JSON = Get-Content "./config/Config.json" | Out-String | ConvertFrom-Json
 
 [String]$GW2_EXE = $JSON.GW2_Exe
 [String[]]$START_PARAMS = $JSON.Start_Params
