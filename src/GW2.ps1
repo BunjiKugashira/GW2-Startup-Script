@@ -2,7 +2,7 @@
 Param()
 
 # Config - Change these variables to match your personal setup
-$JSON = Get-Content "../config/Config.json" | Out-String | ConvertFrom-Json
+$JSON = Get-Content "./config/Config.json" | Out-String | ConvertFrom-Json
 
 [String]$GW2_EXE = $JSON.GW2_Exe
 [String[]]$START_PARAMS = $JSON.Start_Params
@@ -46,20 +46,24 @@ function test_config() {
     try {
         if (!(Test-Path $GW2_EXE)) {
             Write-Error "GW2 executable was not found at given path `"$GW2_EXE`"."
+            Read-Host
             exit -1
         }
     } catch {
         Write-Error "GW2 executable path `"$GW2_EXE`" is not a valid path."
+        Read-Host
         exit -1
     }
 
     try {
         if (!(Test-Path $TACO_EXE)) {
             Write-Error "TACO executable was not found at given path `"$TACO_EXE`"."
+            Read-Host
             exit -1
         }
     } catch {
         Write-Error "TACO executable path `"$TACO_EXE`" is not a valid path."
+        Read-Host
         exit -1
     }
     Write-Verbose "Testing Configuration complete."
@@ -150,6 +154,7 @@ function start_taco() {
     while (!(is_running $TACO_EXE 3)) {
         if (!(is_running $GW2_EXE 3)) {
             Write-Error "Guild Wars 2 was closed unexpectedly."
+            Read-Host
             exit -1
         }
 
