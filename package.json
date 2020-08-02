@@ -1,0 +1,21 @@
+{
+    "name": "@bunjikugashira/gw2_startup_script",
+    "version": "0.1.0-alpha.8",
+    "description": "A script to update ArcDps and then start GW2 and TacO",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/BunjiKugashira/GW2-Startup-Script.git"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/BunjiKugashira/GW2-Startup-Script/issues"
+    },
+    "homepage": "https://github.com/BunjiKugashira/GW2-Startup-Script#readme",
+    "dependencies": {
+        "node-notifier": "^7.0.1",
+        "openid-client": "13.15.6"
+    },
+    "scripts": {
+        "build": "mkdir -p dist && cp -r ./src/config ./dist/config && mv ./dist/config/Config-template.json ./dist/config/Config.json"
+    }
+}
