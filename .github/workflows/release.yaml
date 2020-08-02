@@ -35,7 +35,7 @@ jobs:
         id: test_true
         uses: haya14busa/action-cond@v1
         with:
-          cond: "${{ 'a' == 'a' }}"
+          cond: ${{ 'a' == 'a' }}
           if_true: "true"
           if_false: "false"
 
@@ -43,7 +43,7 @@ jobs:
         id: test_false
         uses: haya14busa/action-cond@v1
         with:
-          cond: "${{ 'a' == 'b' }}"
+          cond: ${{ 'a' == 'b' }}
           if_true: "true"
           if_false: "false"
 
