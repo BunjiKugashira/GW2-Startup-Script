@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: 'Determine Dry or Release'
-        if: ${GITHUB_REF} != 'refs/heads/master' && ${GITHUB_REF} != 'refs/heads/develop' && ${GITHUB_REF} != 'refs/heads/beta'
+        if: $GITHUB_REF != 'refs/heads/master' && $GITHUB_REF != 'refs/heads/develop' && $GITHUB_REF != 'refs/heads/beta'
         uses: allenevans/set-env@v1.0.0
         with:
           DRY_FLAG: '--dry'
@@ -40,13 +40,13 @@ jobs:
         run: npm install -g @process-engine/ci_tools@latest
 
       - name: 'Prepare Version'
-        run: ci_tools prepare-version --allow-dirty-workdir ${DRY_FLAG}
+        run: ci_tools prepare-version $DRY_FLAG --allow-dirty-workdir
 
       - name: 'Commit & tag version'
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: ci_tools commit-and-tag-version  ${DRY_FLAG}
+        run: ci_tools commit-and-tag-version $DRY_FLAG
 
       - name: 'Setup ps2exe'
         working-directory: ./PS2EXE
@@ -65,5 +65,5 @@ jobs:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
         run: |
-          ci_tools update-github-release ${DRY_FLAG} --use-title-and-text-from-git-tag
-          ci_tools update-github-release ${DRY_FLAG} --assets dist/GW2-Startup-Script.zip
+          ci_tools update-github-release $DRY_FLAG --use-title-and-text-from-git-tag
+          ci_tools update-github-release $DRY_FLAG --assets dist/GW2-Startup-Script.zip
