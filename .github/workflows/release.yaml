@@ -19,9 +19,18 @@ jobs:
       run:
         shell: powershell -Version 4.0 {0}
         working-directory: ./
+        env:
+          DRY_FLAG: ''
 
     steps:
-      - uses: actions/checkout@v2
+      - name: 'Determine Dry or Release'
+        if: github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/beta'
+        uses: allenevans/set-env@v1.0.0
+        with:
+          DRY_FLAG: '--dry'
+
+      - name: 'Checkout Branch'
+        uses: actions/checkout@v2
 
       - name: 'Setup Node'
         uses: actions/setup-node@v1
@@ -32,23 +41,14 @@ jobs:
       - name: 'Install CI-Tools'
         run: npm install -g @process-engine/ci_tools@latest
 
-      - name: 'Dry run Prepare Version'
-        run: ci_tools prepare-version --allow-dirty-workdir --dry
-
       - name: 'Prepare Version'
-        run: ci_tools prepare-version --allow-dirty-workdir --only-on-primary-branches
-
-      - name: 'Dry run Commit & tag version'
-        env:
-          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
-          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: ci_tools commit-and-tag-version --dry
+        run: ci_tools prepare-version --allow-dirty-workdir ${DRY_FLAG}
 
       - name: 'Commit & tag version'
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: ci_tools commit-and-tag-version --only-on-primary-branches
+        run: ci_tools commit-and-tag-version  ${DRY_FLAG}
 
       - name: 'Setup ps2exe'
         working-directory: ./PS2EXE
@@ -62,18 +62,10 @@ jobs:
         working-directory: ./dist
         run: Compress-Archive "./*" "GW2-Startup-Script.zip"
 
-      - name: 'Dry run Create github release'
-        env:
-          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
-          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: |
-          ci_tools update-github-release --dry --use-title-and-text-from-git-tag
-          ci_tools update-github-release --dry --assets dist/GW2-Startup-Script.zip
-
       - name: 'Create github release'
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
         run: |
-          ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-          ci_tools update-github-release --only-on-primary-branches --assets dist/GW2-Startup-Script.zip
+          ci_tools update-github-release ${DRY_FLAG} --use-title-and-text-from-git-tag
+          ci_tools update-github-release ${DRY_FLAG} --assets dist/GW2-Startup-Script.zip
