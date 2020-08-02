@@ -17,7 +17,6 @@ jobs:
 
     defaults:
       run:
-        shell: powershell -Version 4.0 {0}
         working-directory: ./
 
     steps:
@@ -45,10 +44,12 @@ jobs:
         run: ci_tools prepare-version --allow-dirty-workdir
 
       - name: 'Setup ps2exe'
+        shell: powershell -Version 4.0 {0}
         working-directory: ./PS2EXE
         run: Install-Module -Scope CurrentUser -Force ps2exe
 
       - name: 'Create exe'
+        shell: powershell -Version 4.0 {0}
         working-directory: ./src
         run: ps2exe -IconFile GW2.ico -InputFile GW2.ps1 -OutputFile "../dist/GW2 Startup Script.exe" -title "GW2 Startup Script" -version ${require('../package.json').version}
 
