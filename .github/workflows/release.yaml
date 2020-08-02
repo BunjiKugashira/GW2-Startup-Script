@@ -17,11 +17,19 @@ jobs:
 
     defaults:
       run:
-        shell: powershell -Version 4.0 {0}
         working-directory: ./
 
     steps:
-      - uses: actions/checkout@v2
+      - name: 'Determine Dry or Release'
+        id: dry
+        uses: haya14busa/action-cond@v1
+        with:
+          cond: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/beta' }}
+          if_true: ""
+          if_false: "--dry"
+
+      - name: 'Checkout Branch'
+        uses: actions/checkout@v2
 
       - name: 'Setup Node'
         uses: actions/setup-node@v1
@@ -35,17 +43,13 @@ jobs:
       - name: 'Prepare Version'
         run: ci_tools prepare-version --allow-dirty-workdir
 
-      - name: 'Commit & tag version'
-        env:
-          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
-          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: ci_tools commit-and-tag-version --only-on-primary-branches
-
       - name: 'Setup ps2exe'
+        shell: powershell -Version 4.0 {0}
         working-directory: ./PS2EXE
         run: Install-Module -Scope CurrentUser -Force ps2exe
 
       - name: 'Create exe'
+        shell: powershell -Version 4.0 {0}
         working-directory: ./src
         run: ps2exe -IconFile GW2.ico -InputFile GW2.ps1 -OutputFile "../dist/GW2 Startup Script.exe" -title "GW2 Startup Script" -version ${require('../package.json').version}
 
@@ -53,10 +57,16 @@ jobs:
         working-directory: ./dist
         run: Compress-Archive "./*" "GW2-Startup-Script.zip"
 
+      - name: 'Commit & tag version'
+        env:
+          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
+          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
+        run: ci_tools commit-and-tag-version ${{ steps.dry.outputs.value }}
+
       - name: 'Create github release'
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
         run: |
-          ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-          ci_tools update-github-release --only-on-primary-branches --assets dist/GW2-Startup-Script.zip
+          ci_tools update-github-release ${{ steps.dry.outputs.value }} --use-title-and-text-from-git-tag
+          ci_tools update-github-release ${{ steps.dry.outputs.value }} --assets dist/GW2-Startup-Script.zip
