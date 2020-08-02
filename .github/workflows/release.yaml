@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: 'Determine Dry or Release'
-        if: $GITHUB_REF != 'refs/heads/master' && $GITHUB_REF != 'refs/heads/develop' && $GITHUB_REF != 'refs/heads/beta'
+        if: github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/beta'
         uses: allenevans/set-env@v1.0.0
         with:
           DRY_FLAG: '--dry'
