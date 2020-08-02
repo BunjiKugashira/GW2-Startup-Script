@@ -25,7 +25,7 @@ jobs:
         uses: haya14busa/action-cond@v1
         with:
           cond: "${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/beta' }}"
-          if_true: ""
+          if_true: " "
           if_false: "--dry"
 
       - name: 'Print Branch Name'
