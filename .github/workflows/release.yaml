@@ -28,6 +28,8 @@ jobs:
           DRY_FLAG: '--dry'
 
       - name: 'Test Dry Flag'
+        env:
+          DRY_FLAG: ${DRY_FLAG}
         run: |
           echo "DRY_FLAG=$DRY_FLAG"
           printenv
