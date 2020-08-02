@@ -47,6 +47,11 @@ jobs:
           if_true: "true"
           if_false: "false"
 
+      - name: 'Print Test Output'
+        run: |
+          echo "true = ${{ steps.test_true.outputs.value }}"
+          echo "false = ${{ steps.test_false.outputs.value }}"
+
       - name: 'Checkout Branch'
         uses: actions/checkout@v2
 
