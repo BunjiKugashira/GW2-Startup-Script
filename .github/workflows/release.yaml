@@ -32,8 +32,17 @@ jobs:
       - name: 'Install CI-Tools'
         run: npm install -g @process-engine/ci_tools@latest
 
+      - name: 'Dry run Prepare Version'
+        run: ci_tools prepare-version --allow-dirty-workdir --dry
+
       - name: 'Prepare Version'
-        run: ci_tools prepare-version --allow-dirty-workdir
+        run: ci_tools prepare-version --allow-dirty-workdir --only-on-primary-branches
+
+      - name: 'Dry run Commit & tag version'
+        env:
+          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
+          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
+        run: ci_tools commit-and-tag-version --dry
 
       - name: 'Commit & tag version'
         env:
@@ -52,6 +61,14 @@ jobs:
       - name: 'Create zip'
         working-directory: ./dist
         run: Compress-Archive "./*" "GW2-Startup-Script.zip"
+
+      - name: 'Dry run Create github release'
+        env:
+          GH_USER: ${{ secrets.GH_CI_USER_NAME }}
+          GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
+        run: |
+          ci_tools update-github-release --dry --use-title-and-text-from-git-tag
+          ci_tools update-github-release --dry --assets dist/GW2-Startup-Script.zip
 
       - name: 'Create github release'
         env:
