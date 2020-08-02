@@ -28,30 +28,6 @@ jobs:
           if_true: " "
           if_false: "--dry"
 
-      - name: 'Print Branch Name'
-        run: echo ${{ github.ref }}
-
-      - name: 'Test Condition true'
-        id: test_true
-        uses: haya14busa/action-cond@v1
-        with:
-          cond: ${{ 'a' == 'a' }}
-          if_true: "true"
-          if_false: "false"
-
-      - name: 'Test Condition false'
-        id: test_false
-        uses: haya14busa/action-cond@v1
-        with:
-          cond: ${{ 'a' == 'b' }}
-          if_true: "true"
-          if_false: "false"
-
-      - name: 'Print Test Output'
-        run: |
-          echo "true = ${{ steps.test_true.outputs.value }}"
-          echo "false = ${{ steps.test_false.outputs.value }}"
-
       - name: 'Checkout Branch'
         uses: actions/checkout@v2
 
