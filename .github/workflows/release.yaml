@@ -27,6 +27,11 @@ jobs:
         with:
           DRY_FLAG: '--dry'
 
+      - name: 'Test Dry Flag'
+        run: |
+          echo "DRY_FLAG=${DRY_FLAG}"
+          printenv
+
       - name: 'Checkout Branch'
         uses: actions/checkout@v2
 
@@ -58,12 +63,12 @@ jobs:
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: ci_tools commit-and-tag-version ${DRY_FLAG}
+        run: ci_tools commit-and-tag-version --dry
 
       - name: 'Create github release'
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
         run: |
-          ci_tools update-github-release ${DRY_FLAG} --use-title-and-text-from-git-tag
-          ci_tools update-github-release ${DRY_FLAG} --assets dist/GW2-Startup-Script.zip
+          ci_tools update-github-release --dry --use-title-and-text-from-git-tag
+          ci_tools update-github-release --dry --assets dist/GW2-Startup-Script.zip
