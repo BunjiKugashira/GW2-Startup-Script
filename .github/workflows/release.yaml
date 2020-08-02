@@ -29,9 +29,6 @@ jobs:
           if_true: ""
           if_false: "--dry"
 
-      - name: 'Test Dry Flag'
-        run: echo "DRY_FLAG=${{ steps.dry.outputs.value }}"
-
       - name: 'Checkout Branch'
         uses: actions/checkout@v2
 
