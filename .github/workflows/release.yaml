@@ -36,12 +36,16 @@ jobs:
         uses: haya14busa/action-cond@v1
         with:
           cond: "${{ 'a' == 'a' }}"
+          if_true: "true"
+          if_false: "false"
 
       - name: 'Test Condition false'
         id: test_false
         uses: haya14busa/action-cond@v1
         with:
           cond: "${{ 'a' == 'b' }}"
+          if_true: "true"
+          if_false: "false"
 
       - name: 'Checkout Branch'
         uses: actions/checkout@v2
