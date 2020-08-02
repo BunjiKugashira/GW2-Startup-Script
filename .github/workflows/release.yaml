@@ -60,12 +60,12 @@ jobs:
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
-        run: ci_tools commit-and-tag-version --dry
+        run: ci_tools commit-and-tag-version ${{ steps.dry.outputs.value }}
 
       - name: 'Create github release'
         env:
           GH_USER: ${{ secrets.GH_CI_USER_NAME }}
           GH_TOKEN: ${{ secrets.GH_CI_USER_TOKEN }}
         run: |
-          ci_tools update-github-release --dry --use-title-and-text-from-git-tag
-          ci_tools update-github-release --dry --assets dist/GW2-Startup-Script.zip
+          ci_tools update-github-release ${{ steps.dry.outputs.value }} --use-title-and-text-from-git-tag
+          ci_tools update-github-release ${{ steps.dry.outputs.value }} --assets dist/GW2-Startup-Script.zip
