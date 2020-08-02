@@ -16,11 +16,11 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
 
     defaults:
+      env:
+        DRY_FLAG: ''
       run:
         shell: powershell -Version 4.0 {0}
         working-directory: ./
-        env:
-          DRY_FLAG: ''
 
     steps:
       - name: 'Determine Dry or Release'
