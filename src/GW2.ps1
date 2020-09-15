@@ -10,6 +10,7 @@ $JSON = Get-Content "./config/Config.json" | Out-String | ConvertFrom-Json
 [String]$TACO_EXE = $JSON.TacO_Exe
 
 [Int]$DOWNLOAD_RETRIES = $JSON.Download_Retries
+[Int]$STABILITY_CHECK_SECONDS = $JSON.Stability_Check_Duration_Seconds
 
 # Program - Do not change anything beyond this point unless you know what you're doing
 
