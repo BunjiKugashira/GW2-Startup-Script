@@ -169,11 +169,29 @@ function start_taco() {
     Write-Verbose "Starting TacO complete."
 }
 
+function monitor_game_stability() {
+    do {
+        $process_name = [System.IO.Path]::GetFileNameWithoutExtension($GW2_EXE)
+        $process = Get-Process -Name $process_name -ErrorAction SilentlyContinue
+
+        $exit = $process.WaitForExit($STABILITY_CHECK_SECONDS * 1000)
+        if ($exit) {
+            $error_message = Get-Process -ErrorAction SilentlyContinue "rundll32" | Where-Object {$_.MainWindowTitle -like "Fehler"}
+            if ($error_message) {
+                Write-Verbose "Found error message."
+            } else {
+                Write-Verbose "No error message."
+            }
+        }
+    } while (is_running($GW2_EXE, 3))
+}
+
 function main() {
     test_config
     update_arc
     start_gw2
     start_taco
+    monitor_game_stability
     exit 0
 }
 
