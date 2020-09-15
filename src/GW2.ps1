@@ -116,10 +116,10 @@ function update_file($file_path, $origin_md5sum, $retries) {
 function update_arc() {
     Write-Verbose "Updating Arc-Dps..."
     $origin_md5sum = download_as_string "$ARC_URL$ARC_MD5"
-    foreach ($file in $ARC_FILES) {
-        $file_path = Join-Path $ARC_FOLDER $file
-        update_file $file_path $origin_md5sum $DOWNLOAD_RETRIES
-    }
+    # foreach ($file in $ARC_FILES) {
+    #     $file_path = Join-Path $ARC_FOLDER $file
+    #     update_file $file_path $origin_md5sum $DOWNLOAD_RETRIES
+    # }
     Write-Verbose "Updating Arc-Dps complete."
 }
 
