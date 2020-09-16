@@ -117,10 +117,24 @@ function update_file($file_path, $origin_md5sum, $retries) {
 function update_arc() {
     Write-Verbose "Updating Arc-Dps..."
     $origin_md5sum = download_as_string "$ARC_URL$ARC_MD5"
-    # foreach ($file in $ARC_FILES) {
-    #     $file_path = Join-Path $ARC_FOLDER $file
-    #     update_file $file_path $origin_md5sum $DOWNLOAD_RETRIES
-    # }
+
+    foreach ($file in $ARC_FILES) {
+        $file_path = Join-Path $ARC_FOLDER $file
+        $broke_md5_path = $file_path + ".broke"
+        $broke_md5sum = Get-Content $broke_md5_path -ErrorAction SilentlyContinue
+
+        if ($broke_md5sum) {
+            if ($origin_md5sum -like "*$broke_md5sum*") {
+                Write-Verbose "Current version is broken. Update canceled."
+                return
+            } else {
+                Write-Verbose "Arc-Dps is no longer broken."
+                Remove-Item $broke_md5_path
+            }
+        }
+
+        update_file $file_path $origin_md5sum $DOWNLOAD_RETRIES
+    }
     Write-Verbose "Updating Arc-Dps complete."
 }
 
