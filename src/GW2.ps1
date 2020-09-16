@@ -205,11 +205,23 @@ function monitor_game_stability() {
 
         $exit = $process.WaitForExit($STABILITY_CHECK_SECONDS * 1000)
         if ($exit) {
+            Write-Verbose "Guild Wars 2 has been closed."
             $error_message = Get-Process -ErrorAction SilentlyContinue "rundll32" | Where-Object {$_.MainWindowTitle -like "Fehler"}
+
             if ($error_message) {
                 Write-Verbose "Found error message."
+                Stop-Process $error_message
+
+                ban_current_arc_version
+                start_gw2
+                start_taco
+
+                Write-Host "Press any key to exit..."
+                Read-Host
+                return
             } else {
                 Write-Verbose "No error message."
+                return
             }
         }
     } while (is_running($GW2_EXE, 3))
