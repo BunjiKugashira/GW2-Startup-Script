@@ -170,6 +170,20 @@ function start_taco() {
     Write-Verbose "Starting TacO complete."
 }
 
+function ban_current_arc_version() {
+    Write-Host "Removing current version of Arc-Dps due to stability issues."
+    foreach ($file in $ARC_FILES) {
+        $file_path = Join-Path $ARC_FOLDER $file
+        $ban_path = $file_path + ".broke"
+        $md5 = md5 $file_path
+
+        New-Item $ban_path
+        Set-Content $ban_path $md5
+
+        Remove-Item $file_path
+    }
+}
+
 function monitor_game_stability() {
     do {
         $process_name = [System.IO.Path]::GetFileNameWithoutExtension($GW2_EXE)
