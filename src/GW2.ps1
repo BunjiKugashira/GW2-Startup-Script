@@ -10,6 +10,7 @@ $JSON = Get-Content "./config/Config.json" | Out-String | ConvertFrom-Json
 [String]$TACO_EXE = $JSON.TacO_Exe
 
 [Int]$DOWNLOAD_RETRIES = $JSON.Download_Retries
+[Int]$STABILITY_CHECK_SECONDS = $JSON.Stability_Check_Duration_Seconds
 
 # Program - Do not change anything beyond this point unless you know what you're doing
 
@@ -116,8 +117,22 @@ function update_file($file_path, $origin_md5sum, $retries) {
 function update_arc() {
     Write-Verbose "Updating Arc-Dps..."
     $origin_md5sum = download_as_string "$ARC_URL$ARC_MD5"
+
     foreach ($file in $ARC_FILES) {
         $file_path = Join-Path $ARC_FOLDER $file
+        $broke_md5_path = $file_path + ".broke"
+        $broke_md5sum = Get-Content $broke_md5_path -ErrorAction SilentlyContinue
+
+        if ($broke_md5sum) {
+            if ($origin_md5sum -like "*$broke_md5sum*") {
+                Write-Verbose "Current version is broken. Update canceled."
+                return
+            } else {
+                Write-Verbose "Arc-Dps is no longer broken."
+                Remove-Item $broke_md5_path
+            }
+        }
+
         update_file $file_path $origin_md5sum $DOWNLOAD_RETRIES
     }
     Write-Verbose "Updating Arc-Dps complete."
@@ -169,11 +184,55 @@ function start_taco() {
     Write-Verbose "Starting TacO complete."
 }
 
+function ban_current_arc_version() {
+    Write-Host "Removing current version of Arc-Dps due to stability issues."
+    foreach ($file in $ARC_FILES) {
+        $file_path = Join-Path $ARC_FOLDER $file
+        $ban_path = $file_path + ".broke"
+        $md5 = md5 $file_path
+
+        New-Item $ban_path
+        Set-Content $ban_path $md5
+
+        Remove-Item $file_path
+    }
+}
+
+function monitor_game_stability() {
+    do {
+        $process_name = [System.IO.Path]::GetFileNameWithoutExtension($GW2_EXE)
+        $process = Get-Process -Name $process_name -ErrorAction SilentlyContinue
+
+        $exit = $process.WaitForExit($STABILITY_CHECK_SECONDS * 1000)
+        if ($exit) {
+            Write-Verbose "Guild Wars 2 has been closed."
+            $error_message = Get-Process -ErrorAction SilentlyContinue "rundll32" | Where-Object {$_.MainWindowTitle -like "Fehler"}
+
+            if ($error_message) {
+                Write-Verbose "Found error message."
+                Stop-Process $error_message
+
+                ban_current_arc_version
+                start_gw2
+                start_taco
+
+                Write-Host "Press any key to exit..."
+                Read-Host
+                return
+            } else {
+                Write-Verbose "No error message."
+                return
+            }
+        }
+    } while (is_running($GW2_EXE, 3))
+}
+
 function main() {
     test_config
     update_arc
     start_gw2
     start_taco
+    monitor_game_stability
     exit 0
 }
 

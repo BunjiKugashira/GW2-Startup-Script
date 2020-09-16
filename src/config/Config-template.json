@@ -2,5 +2,6 @@
     "GW2_Exe": "C:/my/gw2/folder/Gw2-64.exe",
     "TacO_Exe": "C:/my/taco/folder/GW2TacO.exe",
     "Start_Params": ["-maploadinfo"],
-    "Download_Retries": 5
+    "Download_Retries": 5,
+    "Stability_Check_Duration_Seconds": 60
 }
