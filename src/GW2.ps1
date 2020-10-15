@@ -200,10 +200,13 @@ function ban_current_arc_version() {
 
 function monitor_game_stability() {
     $process_name = [System.IO.Path]::GetFileNameWithoutExtension($GW2_EXE)
-    $process = Get-Process -Name $process_name -ErrorAction SilentlyContinue
+    $exit = $true
 
-    Write-Host "Monitoring game stability for $STABILITY_CHECK_SECONDS seconds..."
-    $exit = $process.WaitForExit($STABILITY_CHECK_SECONDS * 1000)
+    for ($process = Get-Process -Name $process_name -ErrorAction SilentlyContinue; $process -And $exit; $process = Get-Process -Name $process_name -ErrorAction SilentlyContinue) {
+        Write-Host "Monitoring game stability for $STABILITY_CHECK_SECONDS seconds..."
+        $exit = $process.WaitForExit($STABILITY_CHECK_SECONDS * 1000)
+    }
+
     if ($exit) {
         Write-Verbose "Guild Wars 2 has been closed."
         $error_message = Get-Process -ErrorAction SilentlyContinue "rundll32" | Where-Object {$_.MainWindowTitle -like "Fehler"}
@@ -220,8 +223,25 @@ function monitor_game_stability() {
             Read-Host
             return
         } else {
+            while ($true) {
+                Write-Host "GW2 has been closed during the script's monitoring time."
+                Write-Host "Has the game crashed? yes/no"
+                $answer = Read-Host
+
+                if ($answer -eq "yes") {
+                    ban_current_arc_version
+                    start_gw2
+                    start_taco
+                    return
+                }
+                if ($answer -eq "no") {
+                    return
+                }
+
+                Write-Host "Invalid answer. Please answer yes or no."
+            }
+
             Write-Verbose "No error message."
-            return
         }
     }
 }
