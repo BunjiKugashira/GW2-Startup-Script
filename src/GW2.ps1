@@ -223,8 +223,25 @@ function monitor_game_stability() {
             Read-Host
             return
         } else {
+            while ($true) {
+                Write-Host "GW2 has been closed during the script's monitoring time."
+                Write-Host "Has the game crashed? yes/no"
+                $answer = Read-Host
+
+                if ($answer -eq "yes") {
+                    ban_current_arc_version
+                    start_gw2
+                    start_taco
+                    return
+                }
+                if ($answer -eq "no") {
+                    return
+                }
+
+                Write-Host "Invalid answer. Please answer yes or no."
+            }
+
             Write-Verbose "No error message."
-            return
         }
     }
 }
