@@ -3,5 +3,6 @@
     "TacO_Exe": "C:/my/taco/folder/GW2TacO.exe",
     "Start_Params": ["-maploadinfo"],
     "Download_Retries": 5,
-    "Stability_Check_Duration_Seconds": 60
+    "Stability_Check_Duration_Seconds": 60,
+    "Directx_Version": 9
 }
