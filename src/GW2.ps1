@@ -1,7 +1,7 @@
 [CmdletBinding(SupportsShouldProcess=$true)]
 Param()
 
-# Config - Change these variables to match your personal setup
+# Config
 $JSON = Get-Content "./config/Config.json" | Out-String | ConvertFrom-Json
 
 [String]$GW2_EXE = $JSON.GW2_Exe
@@ -12,7 +12,9 @@ $JSON = Get-Content "./config/Config.json" | Out-String | ConvertFrom-Json
 [Int]$DOWNLOAD_RETRIES = $JSON.Download_Retries
 [Int]$STABILITY_CHECK_SECONDS = $JSON.Stability_Check_Duration_Seconds
 
-# Program - Do not change anything beyond this point unless you know what you're doing
+[string]$DIRECTX_VERSION = $JSON.Directx_Version
+
+# Program
 
 # Fight Bugs                      |     |
 #                                 \\_V_//
@@ -37,10 +39,28 @@ $JSON = Get-Content "./config/Config.json" | Out-String | ConvertFrom-Json
 # / / /       \/       \ \ \  [____>   <____]
 
 [String]$GW2_FOLDER = Split-Path -Path $GW2_EXE
-[String]$ARC_FOLDER = Join-Path $GW2_FOLDER "bin64"
 [String]$ARC_URL = "https://www.deltaconnected.com/arcdps/x64/"
 [String]$ARC_MD5 = "d3d9.dll.md5sum"
-[String[]]$ARC_FILES = @("d3d9.dll")
+
+switch ($DIRECTX_VERSION) {
+    "9" { [PSCustomObject[]]$ARC_FILES = @(
+        [PSCustomObject]@{
+            Origin="d3d9.dll"
+            Local=(Join-Path $GW2_FOLDER "bin64" | Join-Path -ChildPath "d3d9.dll")
+        }
+    ) }
+    "11" { [PSCustomObject[]]$ARC_FILES = @(
+        [PSCustomObject]@{
+            Origin="d3d9.dll"
+            Local=(Join-Path $GW2_FOLDER "d3d11.dll") 
+        }
+    ) }
+    Default {
+        Write-Error "Unknown DirectX Version `"$DIRECTX_VERSION`"."
+        Read-Host
+        exit -1
+    }
+}
 
 function test_config() {
     Write-Verbose "Testing Configuration..."
@@ -94,23 +114,27 @@ function md5($file) {
     return $ans.Hash
 }
 
-function update_file($file_path, $origin_md5sum, $retries) {
-    if (!(Test-Path $file_path)) {
-        Write-Host "Downloading file $file_path..."
-        download_to_file "$ARC_URL$file" $file_path
+function update_file($file, $origin_md5sum, $retries) {
+    $origin = $file.Origin
+    $origin = "$ARC_URL$origin"
+    $local = $file.Local
+
+    if (!(Test-Path $local)) {
+        Write-Host "Downloading file $local from $remote..."
+        download_to_file $origin $local
         Write-Host "Download complete."
     }
 
-    $md5sum = md5 $file_path
+    $md5sum = md5 $local
     if (!($origin_md5sum -like "*$md5sum*")) {
-        Remove-Item $file_path
-        Write-Host "$file_path does not match md5sum. File has been deleted."
+        Remove-Item $local
+        Write-Host "$local does not match md5sum. File has been deleted."
         if ($retries -gt 0) {
             Write-Host "$retries retries left. Attempting retry..."
-            update_file $file_path $origin_md5sum ($retries - 1)
+            update_file $file $origin_md5sum ($retries - 1)
         }
     } else {
-        Write-Host "$file_path is up-to-date."
+        Write-Host "$local is up-to-date."
     }
 }
 
@@ -119,7 +143,7 @@ function update_arc() {
     $origin_md5sum = download_as_string "$ARC_URL$ARC_MD5"
 
     foreach ($file in $ARC_FILES) {
-        $file_path = Join-Path $ARC_FOLDER $file
+        $file_path = $file.Local
         $broke_md5_path = $file_path + ".broke"
         $broke_md5sum = Get-Content $broke_md5_path -ErrorAction SilentlyContinue
 
@@ -133,7 +157,7 @@ function update_arc() {
             }
         }
 
-        update_file $file_path $origin_md5sum $DOWNLOAD_RETRIES
+        update_file $file $origin_md5sum $DOWNLOAD_RETRIES
     }
     Write-Verbose "Updating Arc-Dps complete."
 }
@@ -187,7 +211,7 @@ function start_taco() {
 function ban_current_arc_version() {
     Write-Host "Removing current version of Arc-Dps due to stability issues."
     foreach ($file in $ARC_FILES) {
-        $file_path = Join-Path $ARC_FOLDER $file
+        $file_path = $file.Local
         $ban_path = $file_path + ".broke"
         $md5 = md5 $file_path
 
