@@ -1,6 +1,6 @@
 {
     "name": "@bunjikugashira/gw2_startup_script",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "A script to update ArcDps and then start GW2 and TacO",
     "repository": {
         "type": "git",

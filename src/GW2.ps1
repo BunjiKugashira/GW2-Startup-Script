@@ -40,18 +40,18 @@ $JSON = Get-Content "./config/Config.json" | Out-String | ConvertFrom-Json
 
 [String]$GW2_FOLDER = Split-Path -Path $GW2_EXE
 [String]$ARC_URL = "https://www.deltaconnected.com/arcdps/x64/"
-[String]$ARC_MD5 = "d3d9.dll.md5sum"
+[String]$ARC_MD5 = "d3d11.dll.md5sum"
 
 switch ($DIRECTX_VERSION) {
     "9" { [PSCustomObject[]]$ARC_FILES = @(
         [PSCustomObject]@{
-            Origin="d3d9.dll"
+            Origin="d3d11.dll"
             Local=(Join-Path $GW2_FOLDER "bin64" | Join-Path -ChildPath "d3d9.dll")
         }
     ) }
     "11" { [PSCustomObject[]]$ARC_FILES = @(
         [PSCustomObject]@{
-            Origin="d3d9.dll"
+            Origin="d3d11.dll"
             Local=(Join-Path $GW2_FOLDER "d3d11.dll") 
         }
     ) }
